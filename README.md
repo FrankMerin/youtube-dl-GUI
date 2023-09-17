@@ -6,7 +6,7 @@ youtube-dl - https://github.com/ytdl-org/youtube-dl
 ffmpeg - https://ffmpeg.org/
 
 #### _Before using for the first time_
-set the below two variables to the correct path. The path to your youtube-dl.exe and the output folder you would like. (Make sure that your output path includes a \ at the end)
+set the below two variables to the correct path. The path to your youtube-dl.exe and the output folder you would like. 
 default_youtube_dl_path 
 default_output_directory
 

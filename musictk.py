@@ -31,6 +31,7 @@ def clean_youtube_url(url):
 
 def download_mp3():
     try:
+        global output_directory
         download_button.config(state=tk.DISABLED)
         status_label.config(text="")
         animate_spinner()
@@ -41,10 +42,13 @@ def download_mp3():
         youtube_url = url_entry.get()
         
 
-        if not os.path.exists(output_directory) or not output_directory.endswith('\\'):
-            raise ValueError("Invalid or non-existent output directory")
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
 
-        if not youtube_url.startswith("https://www.youtube.com/"):
+        if not output_directory.endswith('\\'):
+            output_directory = output_directory + '\\'
+
+        if not re.search(r'youtube\.com', youtube_url):
             raise ValueError("Invalid YouTube URL")
 
         clean_url = clean_youtube_url(youtube_url)
@@ -62,6 +66,7 @@ def download_mp3():
         download_thread.start()
     except Exception as e:
         update_status(f"Error: {e}")
+        
 def update_status(message):
     download_button.config(state=tk.NORMAL)
     status_label.config(text=message)
