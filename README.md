@@ -3,17 +3,20 @@
 ### _Pre-Reqs:_
 
 youtube-dl - https://github.com/ytdl-org/youtube-dl
+
 ffmpeg - https://ffmpeg.org/
 
 #### _Before using for the first time_
 set the below two variables to the correct path. The path to your youtube-dl.exe and the output folder you would like. (Make sure that your output path includes a \ at the end)
+
 default_youtube_dl_path 
+
 default_output_directory
 
 Keep youtube-dl and ffmpeg in the same folder
 
 #### _Set as windows shortcut:_
-To run this as a shortcut, create a shortcut, set the properties for "Target" to the following...
+To run this as a shortcut, create a shortcut, set the properties for "Target" to the following... (edit the path as needed)
 C:\Users\{your_python_path}\AppData\Local\Programs\Python\Python310\python.exe C:\Users\{path_to_musictk}\Documents\applet\musictk.py
 
 #### _Run manually:_
