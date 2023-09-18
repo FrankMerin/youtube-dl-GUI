@@ -10,8 +10,31 @@ default_youtube_dl_path = r'C:\Users\......\youtube-dl.exe'  # Default youtube-d
 default_output_directory = 'C:\\Users\\The_Best_Music\\'  # Default output path
 youtube_dl_path = default_youtube_dl_path
 output_directory = default_output_directory
-image_folder = 'spinner_frames' 
+image_folder = 'frames' 
 
+
+def count_png_files(folder_path):
+    png_count = 0
+    if not os.path.exists(folder_path) or not os.path.isdir(folder_path):
+        return png_count  
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".png"):
+            png_count += 1
+    return png_count
+
+def extract_frames_from_gif(input_gif_path, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+
+    with Image.open(input_gif_path) as img:
+        try:
+            frame_number = 1
+            while True:
+                img.save(os.path.join(output_folder, f"frame{frame_number}.png"))
+                frame_number += 1
+                img.seek(img.tell() + 1)
+        except EOFError:
+            pass
+    return frame_number - 1
 
 def set_custom_paths():
     global youtube_dl_path, output_directory
@@ -41,7 +64,6 @@ def download_mp3():
 
         youtube_url = url_entry.get()
         
-
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
@@ -82,7 +104,7 @@ def animate_spinner():
     animate()
 
 def animate():
-    global spinner_index
+    global spinner_index, png_count
     frame_path = os.path.join(image_folder, f'frame{spinner_index}.png')
     image = Image.open(frame_path)
     spinner_image = ImageTk.PhotoImage(image)
@@ -90,12 +112,19 @@ def animate():
     spinner_label.config(image=spinner_image)
     spinner_label.image = spinner_image
     
-    spinner_index = (spinner_index % 31) + 1 
+    spinner_index = (spinner_index % png_count) + 1
+
     
     if spinner_index == 1:
-        app.after(100, animate)
+        app.after(50, animate)
     else:
-        app.after(100, animate)
+        app.after(50, animate)
+
+png_count = count_png_files('frames')
+
+if png_count == 0:
+    png_count = extract_frames_from_gif("loading.gif", "frames")
+
 
 app = tk.Tk()
 app.title("YouTube MP3 Downloader")
