@@ -142,8 +142,8 @@ set_paths_button = ttk.Button(app, text="Set Paths", command=set_custom_paths)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
-download_button.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
-status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+download_button.grid(row=1, column=0, columnspan=2, padx=10, pady=0)
+status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
 
 youtube_dl_path_label.grid(row=4, column=0, padx=10, pady=10)
 youtube_dl_path_entry.grid(row=4, column=1, padx=10, pady=10)
