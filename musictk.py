@@ -120,7 +120,7 @@ if png_count == 0:
 root = tk.Tk()
 root.title("YouTube MP3 Downloader")
 
-url_label = ttk.Label(root, text="Enter the YouTube URL:")
+url_label = ttk.Label(root, text="YouTube Video or Playlist URL:")
 url_entry = ttk.Entry(root, width=40)
 download_button = ttk.Button(root, text="Download MP3", command=download_mp3)
 status_label = ttk.Label(root, text="")
