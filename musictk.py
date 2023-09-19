@@ -5,6 +5,7 @@ import re
 import threading
 from PIL import Image, ImageTk
 import os
+import random
 
 default_youtube_dl_path = r'C:\Users\......\youtube-dl.exe'  # Default youtube-dl.exe path
 default_output_directory = 'C:\\Users\\The_Best_Music\\'  # Default output path
@@ -12,6 +13,8 @@ youtube_dl_path = default_youtube_dl_path
 output_directory = default_output_directory
 image_folder = 'frames' 
 
+continue_animation = True
+random_delay = random.randint(10, 130)
 
 def count_png_files(folder_path):
     png_count = 0
@@ -54,9 +57,10 @@ def clean_youtube_url(url):
 
 def download_mp3():
     try:
-        global output_directory
+        global output_directory, continue_animation
         download_button.config(state=tk.DISABLED)
         status_label.config(text="")
+        continue_animation = True
         animate_spinner()
 
         if not os.path.isfile(youtube_dl_path):
@@ -90,9 +94,11 @@ def download_mp3():
         update_status(f"Error: {e}")
         
 def update_status(message):
+    global continue_animation
     download_button.config(state=tk.NORMAL)
     status_label.config(text=message)
     spinner_label.grid_forget()
+    continue_animation = False
 
 def animate_spinner():
     global spinner_label
@@ -104,7 +110,7 @@ def animate_spinner():
     animate()
 
 def animate():
-    global spinner_index, png_count
+    global spinner_index, png_count, random_delay
     frame_path = os.path.join(image_folder, f'frame{spinner_index}.png')
     image = Image.open(frame_path)
     spinner_image = ImageTk.PhotoImage(image)
@@ -113,12 +119,10 @@ def animate():
     spinner_label.image = spinner_image
     
     spinner_index = (spinner_index % png_count) + 1
-
-    
-    if spinner_index == 1:
-        app.after(50, animate)
-    else:
-        app.after(50, animate)
+    if spinner_index == 2:
+        random_delay = random.randint(5, 100)
+    if continue_animation == True:
+        app.after(random_delay, animate)
 
 png_count = count_png_files('frames')
 
