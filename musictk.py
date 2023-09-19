@@ -6,54 +6,45 @@ import threading
 from PIL import Image, ImageTk
 import os
 import random
+import json
+from helpers import (
+    load_config,
+    count_png_files,
+    extract_frames_from_gif,
+    clean_youtube_url,
+)
 
-default_youtube_dl_path = r'C:\Users\......\youtube-dl.exe'  # Default youtube-dl.exe path
-default_output_directory = 'C:\\Users\\The_Best_Music\\'  # Default output path
-youtube_dl_path = default_youtube_dl_path
-output_directory = default_output_directory
-image_folder = 'frames' 
+
+
+CONFIG_FILE = "config.json"
+IMAGE_FOLDER = 'frames'
+
+configs = load_config()
+youtube_dl_path = configs["youtube_dl_path"]
+output_directory = configs["output_directory"]
 
 continue_animation = True
 random_delay = random.randint(10, 130)
-
-def count_png_files(folder_path):
-    png_count = 0
-    if not os.path.exists(folder_path) or not os.path.isdir(folder_path):
-        return png_count  
-    for filename in os.listdir(folder_path):
-        if filename.endswith(".png"):
-            png_count += 1
-    return png_count
-
-def extract_frames_from_gif(input_gif_path, output_folder):
-    os.makedirs(output_folder, exist_ok=True)
-
-    with Image.open(input_gif_path) as img:
-        try:
-            frame_number = 1
-            while True:
-                img.save(os.path.join(output_folder, f"frame{frame_number}.png"))
-                frame_number += 1
-                img.seek(img.tell() + 1)
-        except EOFError:
-            pass
-    return frame_number - 1
 
 def set_custom_paths():
     global youtube_dl_path, output_directory
     custom_youtube_dl_path = youtube_dl_path_entry.get()
     custom_output_directory = output_directory_entry.get()
-    
+
     if custom_youtube_dl_path:
         youtube_dl_path = custom_youtube_dl_path
-    
+
     if custom_output_directory:
+        if not custom_output_directory.endswith('\\'):
+            custom_output_directory = custom_output_directory + '\\'
         output_directory = custom_output_directory
 
-def clean_youtube_url(url):
-    clean_url = re.sub(r'&list=.*', '', url)
-    return clean_url
-
+    config = {
+        "youtube_dl_path": youtube_dl_path,
+        "output_directory": output_directory
+    }
+    with open(CONFIG_FILE, "w") as f:
+        json.dump(config, f)
 
 def download_mp3():
     try:
@@ -67,12 +58,9 @@ def download_mp3():
             raise FileNotFoundError("youtube-dl not found in the specified path")
 
         youtube_url = url_entry.get()
-        
+
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
-
-        if not output_directory.endswith('\\'):
-            output_directory = output_directory + '\\'
 
         if not re.search(r'youtube\.com', youtube_url):
             raise ValueError("Invalid YouTube URL")
@@ -83,16 +71,16 @@ def download_mp3():
         def run_download():
             try:
                 subprocess.run(youtube_dl_command, shell=True, check=True)
-                app.after(0, lambda: update_status("Download Complete!"))
+                root.after(0, lambda: update_status("Download Complete!"))
             except subprocess.CalledProcessError as e:
-                app.after(0, lambda: update_status(f"Error: {e}"))
-        
+                root.after(0, lambda: update_status(f"Error: {e}"))
+
         global download_thread
         download_thread = threading.Thread(target=run_download)
         download_thread.start()
     except Exception as e:
         update_status(f"Error: {e}")
-        
+
 def update_status(message):
     global continue_animation
     download_button.config(state=tk.NORMAL)
@@ -102,47 +90,46 @@ def update_status(message):
 
 def animate_spinner():
     global spinner_label
-    spinner_label = ttk.Label(app)
+    spinner_label = ttk.Label(root)
     spinner_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
-    
+
     global spinner_index
     spinner_index = 1
     animate()
 
 def animate():
     global spinner_index, png_count, random_delay
-    frame_path = os.path.join(image_folder, f'frame{spinner_index}.png')
+    frame_path = os.path.join(IMAGE_FOLDER, f'frame{spinner_index}.png')
     image = Image.open(frame_path)
     spinner_image = ImageTk.PhotoImage(image)
-    
+
     spinner_label.config(image=spinner_image)
     spinner_label.image = spinner_image
-    
+
     spinner_index = (spinner_index % png_count) + 1
     if spinner_index == 2:
         random_delay = random.randint(5, 100)
-    if continue_animation == True:
-        app.after(random_delay, animate)
+    if continue_animation:
+        root.after(random_delay, animate)
 
-png_count = count_png_files('frames')
-
+png_count = count_png_files(IMAGE_FOLDER)
 if png_count == 0:
-    png_count = extract_frames_from_gif("loading.gif", "frames")
+    png_count = extract_frames_from_gif("loading.gif", IMAGE_FOLDER)
 
 
-app = tk.Tk()
-app.title("YouTube MP3 Downloader")
+root = tk.Tk()
+root.title("YouTube MP3 Downloader")
 
-url_label = ttk.Label(app, text="Enter the YouTube URL:")
-url_entry = ttk.Entry(app, width=40)
-download_button = ttk.Button(app, text="Download MP3", command=download_mp3)
-status_label = ttk.Label(app, text="")
+url_label = ttk.Label(root, text="Enter the YouTube URL:")
+url_entry = ttk.Entry(root, width=40)
+download_button = ttk.Button(root, text="Download MP3", command=download_mp3)
+status_label = ttk.Label(root, text="")
 
-youtube_dl_path_label = ttk.Label(app, text="Current youtube-dl Path:")
-youtube_dl_path_entry = ttk.Entry(app, width=40)
-output_directory_label = ttk.Label(app, text="Current Output Directory:")
-output_directory_entry = ttk.Entry(app, width=40)
-set_paths_button = ttk.Button(app, text="Set Paths", command=set_custom_paths)
+youtube_dl_path_label = ttk.Label(root, text="Current youtube-dl Path:")
+youtube_dl_path_entry = ttk.Entry(root, width=40)
+output_directory_label = ttk.Label(root, text="Current Output Directory:")
+output_directory_entry = ttk.Entry(root, width=40)
+set_paths_button = ttk.Button(root, text="Set Paths", command=set_custom_paths)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
@@ -155,7 +142,7 @@ output_directory_label.grid(row=5, column=0, padx=10, pady=10)
 output_directory_entry.grid(row=5, column=1, padx=10, pady=10)
 set_paths_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
-youtube_dl_path_entry.insert(0, default_youtube_dl_path)
-output_directory_entry.insert(0, default_output_directory)
+youtube_dl_path_entry.insert(0, youtube_dl_path)
+output_directory_entry.insert(0, output_directory)
 
-app.mainloop()
+root.mainloop()
