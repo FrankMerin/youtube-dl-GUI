@@ -28,7 +28,7 @@ if not os.path.exists(config_directory):
     os.makedirs(config_directory)
 CONFIG_FILE = os.path.join(config_directory, "config.json")
 
-IMAGE_FOLDER = os.path.join(config_directory, "frames")
+IMAGE_FOLDER = os.path.join(base_path, "frames")
 
 configs = load_config()
 output_directory = configs["output_directory"]
