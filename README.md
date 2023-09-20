@@ -1,12 +1,15 @@
 # youtube-dl-applet (WINDOWS ONLY)
 
-### _Pre-Reqs:_
+#### _EXE_
+The executable can be launched directly, download is located in \dist\
+
+### _Pre-Reqs (as code):_
 
 youtube-dl - https://github.com/ytdl-org/youtube-dl
 
 ffmpeg - https://ffmpeg.org/
 
-#### _Launching for the first time (as code)_
+#### _Launching for the first time (as code):_
 Set the path to your youtube-dl.exe and the output folder you would like. 
 
 Keep youtube-dl and ffmpeg in the same folder
@@ -18,8 +21,6 @@ C:\Users\{your_python_path}\AppData\Local\Programs\Python\Python310\python.exe C
 #### _Run manually (as code):_
 open terminal... python musictk.py
 
-#### _EXE_
-The executable can be launched directly
 
 
 ## ✨_Usage:_✨
