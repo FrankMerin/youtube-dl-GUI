@@ -1,7 +1,9 @@
 # youtube-dl-applet (WINDOWS ONLY)
 
-#### _EXE_
+### _EXE_
 The executable can be launched directly, download is located in \dist\
+[Download Executable](https://github.com/FrankMerin/youtube-dl-applet/raw/main/dist/musicDL.exe)
+
 
 ### _Pre-Reqs (as code):_
 
