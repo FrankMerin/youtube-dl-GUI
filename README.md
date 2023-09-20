@@ -38,3 +38,8 @@ open terminal... python musictk.py
 
 ![Completed](https://cdn.discordapp.com/attachments/280776371779928074/1153069065703800933/image.png)
 
+#### _Build on your own:_
+
+download the build folder, add yt-dlp and ffmpeg to the folder, run the below command.
+
+pyinstaller --onefile --name musicDL musicDL.py --add-binary "ffmpeg.exe;." --add-binary "yt-dlp.exe;." --add-data "loading.gif;." --add-data "helpersDL.py;."
