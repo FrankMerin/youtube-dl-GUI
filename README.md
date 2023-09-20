@@ -1,9 +1,15 @@
 # youtube-dl-applet (WINDOWS ONLY)
 
+As this utalizes yt-dlp, it supports playlists (public/unlisted), and direct youtube links/share links
+
 ### _EXE_
 The executable can be launched directly, download is located in \dist\
 [Download Executable](https://github.com/FrankMerin/youtube-dl-applet/raw/main/dist/musicDL.exe)
 
+
+## ✨_Usage (as exe):_✨
+
+![Usage image](https://cdn.discordapp.com/attachments/280776371779928074/1153904262380789861/image.png)
 
 ### _Pre-Reqs (as code):_
 
@@ -25,7 +31,7 @@ open terminal... python musictk.py
 
 
 
-## ✨_Usage:_✨
+## ✨_Usage (as code):_✨
 ![Launched image](https://cdn.discordapp.com/attachments/280776371779928074/1153069407027855390/image.png)
 
 ![Running image](https://cdn.discordapp.com/attachments/280776371779928074/1153068704100253767/image.png)
