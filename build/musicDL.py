@@ -19,11 +19,11 @@ from helpersDL import (
 
 base_path = getattr(sys, '_MEIPASS', os.getcwd())
 
-CONFIG_FILE = "config.json"
 IMAGE_FOLDER = 'frames'
 
 configs = load_config()
 youtube_dl_path = os.path.join(base_path, "yt-dlp.exe")
+CONFIG_FILE = os.path.join(base_path, "config.json")
 output_directory = configs["output_directory"]
 
 continue_animation = True
@@ -59,9 +59,9 @@ def download_mp3():
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
-        if not re.search(r'youtube\.com', youtube_url):
+        if not re.search(r'(youtube\.com|youtu\.be)', youtube_url):
             raise ValueError("Invalid YouTube URL")
-
+        
         clean_url = clean_youtube_url(youtube_url)
         youtube_dl_command = f'{youtube_dl_path} -o "{output_directory}%(title)s.%(ext)s" -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 {clean_url}'
 

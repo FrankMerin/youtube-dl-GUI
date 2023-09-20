@@ -1,12 +1,11 @@
 import os
 import json
-import subprocess
 import re
-import threading
 from PIL import Image, ImageTk
-import random
+import sys
 
-config_file = "config.json"  # Set the path to your config file
+base_path = getattr(sys, '_MEIPASS', os.getcwd())
+config_file = os.path.join(base_path, "config.json")
 
 def load_config():
     if not os.path.exists(config_file) or os.path.getsize(config_file) == 0:

@@ -62,7 +62,7 @@ def download_mp3():
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
 
-        if not re.search(r'youtube\.com', youtube_url):
+        if not re.search(r'(youtube\.com|youtu\.be)', youtube_url):
             raise ValueError("Invalid YouTube URL")
 
         clean_url = clean_youtube_url(youtube_url)
