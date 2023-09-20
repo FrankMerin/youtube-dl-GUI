@@ -19,7 +19,6 @@ from helpersDL import (
 
 base_path = getattr(sys, '_MEIPASS', os.getcwd())
 
-IMAGE_FOLDER = 'frames'
 
 
 youtube_dl_path = os.path.join(base_path, "yt-dlp.exe")
@@ -28,6 +27,8 @@ config_directory = os.path.join(os.path.expanduser("~"), ".musicDL")
 if not os.path.exists(config_directory):
     os.makedirs(config_directory)
 CONFIG_FILE = os.path.join(config_directory, "config.json")
+
+IMAGE_FOLDER = os.path.join(config_directory, "frames")
 
 configs = load_config()
 output_directory = configs["output_directory"]
