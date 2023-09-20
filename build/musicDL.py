@@ -21,11 +21,16 @@ base_path = getattr(sys, '_MEIPASS', os.getcwd())
 
 IMAGE_FOLDER = 'frames'
 
-configs = load_config()
-youtube_dl_path = os.path.join(base_path, "yt-dlp.exe")
-CONFIG_FILE = os.path.join(base_path, "config.json")
-output_directory = configs["output_directory"]
 
+youtube_dl_path = os.path.join(base_path, "yt-dlp.exe")
+
+config_directory = os.path.join(os.path.expanduser("~"), ".musicDL")
+if not os.path.exists(config_directory):
+    os.makedirs(config_directory)
+CONFIG_FILE = os.path.join(config_directory, "config.json")
+
+configs = load_config()
+output_directory = configs["output_directory"]
 continue_animation = True
 random_delay = random.randint(10, 130)
 
@@ -38,7 +43,6 @@ def set_custom_paths():
         if not custom_output_directory.endswith('\\'):
             custom_output_directory = custom_output_directory + '\\'
         output_directory = custom_output_directory
-
     config = {
         "output_directory": output_directory
     }

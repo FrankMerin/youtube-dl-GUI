@@ -1,11 +1,17 @@
 import os
 import json
 import re
-from PIL import Image, ImageTk
-import sys
+from PIL import Image
 
-base_path = getattr(sys, '_MEIPASS', os.getcwd())
-config_file = os.path.join(base_path, "config.json")
+
+
+config_directory = os.path.join(os.path.expanduser("~"), ".musicDL")
+
+if not os.path.exists(config_directory):
+    os.makedirs(config_directory)
+
+config_file = os.path.join(config_directory, "config.json")
+
 
 def load_config():
     if not os.path.exists(config_file) or os.path.getsize(config_file) == 0:
@@ -14,7 +20,7 @@ def load_config():
     with open(config_file, "r") as f:
         config = json.load(f)
     default_config = {
-        "output_directory": ""
+        "output_directory": "\\Music\\"
     }
     default_config.update(config)
     return default_config
