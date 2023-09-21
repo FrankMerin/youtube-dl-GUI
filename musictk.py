@@ -62,7 +62,7 @@ def download_content():
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
         
-        if not os.path.isfile(ffmpeg_path):
+        if not os.path.isfile(f'{ffmpeg_path}ffmpeg.exe'):
             raise FileNotFoundError("ffmpeg_path not found in the specified path")
 
         if not re.search(r'(youtube\.com|youtu\.be)', youtube_url):
@@ -75,23 +75,22 @@ def download_content():
             'format': f'bestaudio/best' if file_type in ('M4A', 'MP3') else f'bestvideo[ext={file_type.lower()}]+bestaudio[ext={file_type.lower()}]/best[ext={file_type.lower()}]/best',
             'outtmpl': os.path.join(output_directory, '%(title)s.%(ext)s'),
             'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': file_type.lower(), 'preferredquality': '0'}] if file_type in ('M4A', 'MP3') else [],
-            'ffmpeg_location': 'C:\\Users\\godsw\\OneDrive\\Documents\\applet\\build\\ffmpeg.exe'
+            'ffmpeg_location': f'{ffmpeg_path}ffmpeg.exe'
         }
-
         def run_download():
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([clean_url])
                 root.after(0, lambda: update_status("Download Complete!"))
             except yt_dlp.DownloadError as e:
-                root.after(0, lambda: update_status(f"Error: {e}"))
+                root.after(0, lambda e=e: update_status(f"Error: {e}"))
 
         Thread(target=run_download).start()
 
     except FileNotFoundError as e:
-        root.after(0, lambda: update_status(f"Error: {e}"))
+        root.after(0, lambda e=e: update_status(f"Error: {e}"))
     except ValueError as e:
-        root.after(0, lambda: update_status(f"Error: {e}"))
+        root.after(0, lambda e=e: update_status(f"Error: {e}"))
 
 
 def update_status(message):
