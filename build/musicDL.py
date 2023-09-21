@@ -8,6 +8,9 @@ import os
 import random
 import json
 import sys
+import yt_dlp
+from threading import Thread
+
 
 from helpersDL import (
     load_config,
@@ -21,13 +24,14 @@ base_path = getattr(sys, '_MEIPASS', os.getcwd())
 
 
 
-youtube_dl_path = os.path.join(base_path, "yt-dlp.exe")
+ffmpeg_path = os.path.join(base_path, "ffmpeg.exe")
 
 config_directory = os.path.join(os.path.expanduser("~"), ".musicDL")
 if not os.path.exists(config_directory):
     os.makedirs(config_directory)
-CONFIG_FILE = os.path.join(config_directory, "config.json")
 
+file_types = ["M4A", "MP3", 'MP4']
+CONFIG_FILE = os.path.join(config_directory, "config.json")
 IMAGE_FOLDER = os.path.join(base_path, "frames")
 
 configs = load_config()
@@ -50,9 +54,9 @@ def set_custom_paths():
     with open(CONFIG_FILE, "w") as f:
         json.dump(config, f)
 
-def download_mp3():
+def download_content():
     try:
-        global output_directory, continue_animation
+        global output_directory, continue_animation, ffmpeg_path
         download_button.config(state=tk.DISABLED)
         status_label.config(text="")
         continue_animation = True
@@ -68,20 +72,25 @@ def download_mp3():
             raise ValueError("Invalid YouTube URL")
         
         clean_url = clean_youtube_url(youtube_url)
-        youtube_dl_command = f'{youtube_dl_path} -o "{output_directory}%(title)s.%(ext)s" -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 {clean_url}'
+        file_type = selected_file_type.get()
 
+        ydl_opts = {
+            'format': f'bestaudio/best' if file_type in ('M4A', 'MP3') else f'bestvideo[ext={file_type.lower()}]+bestaudio[ext={file_type.lower()}]/best[ext={file_type.lower()}]/best',
+            'outtmpl': os.path.join(output_directory, '%(title)s.%(ext)s'),
+            'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': file_type.lower(), 'preferredquality': '0'}] if file_type in ('M4A', 'MP3') else [],
+            'ffmpeg_location': ffmpeg_path
+        }
         def run_download():
             try:
-                subprocess.run(youtube_dl_command, shell=True, check=True)
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([clean_url])
                 root.after(0, lambda: update_status("Download Complete!"))
-            except subprocess.CalledProcessError as e:
-                root.after(0, lambda: update_status(f"Error: {e}"))
+            except yt_dlp.DownloadError as e:
+                root.after(0, lambda e=e: update_status(f"Error: {e}"))
 
-        global download_thread
-        download_thread = threading.Thread(target=run_download)
-        download_thread.start()
-    except Exception as e:
-        update_status(f"Error: {e}")
+        Thread(target=run_download).start()
+    except ValueError as e:
+        root.after(0, lambda e=e: update_status(f"Error: {e}"))
 
 def update_status(message):
     global continue_animation
@@ -120,11 +129,17 @@ if png_count == 0:
 
 
 root = tk.Tk()
-root.title("YouTube MP3 Downloader")
+root.title("YouTube Downloader")
+
+selected_file_type = tk.StringVar(root)
+
+file_type_label = ttk.Label(root, text="Select File Type:")
+file_type_combobox = ttk.Combobox(root, textvariable=selected_file_type, values=file_types, width=6)
+file_type_combobox.set(file_types[0])
 
 url_label = ttk.Label(root, text="YouTube Video or Playlist URL:")
 url_entry = ttk.Entry(root, width=40)
-download_button = ttk.Button(root, text="Download MP3", command=download_mp3)
+download_button = ttk.Button(root, text="Download", command=download_content)
 status_label = ttk.Label(root, text="")
 
 output_directory_label = ttk.Label(root, text="Current Output Directory:")
@@ -133,7 +148,9 @@ set_paths_button = ttk.Button(root, text="Set Paths", command=set_custom_paths)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
-download_button.grid(row=1, column=0, columnspan=2, padx=10, pady=0)
+file_type_label.grid(row=1, column=0, padx=10, pady=10, sticky="w") 
+file_type_combobox.grid(row=1, column=1, padx=10, pady=10, sticky="w")  
+download_button.grid(row=1, column=1, padx=100, pady=10, sticky="w")
 status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
 
 
