@@ -7,6 +7,9 @@ from PIL import Image, ImageTk
 import os
 import random
 import json
+import yt_dlp
+from threading import Thread
+
 from helpers import (
     load_config,
     count_png_files,
@@ -15,24 +18,24 @@ from helpers import (
 )
 
 
-
+file_types = ["M4A", "MP3", 'MP4']
 CONFIG_FILE = "config.json"
 IMAGE_FOLDER = 'frames'
 
 configs = load_config()
-youtube_dl_path = configs["youtube_dl_path"]
+ffmpeg_path = configs["ffmpeg_path"]
 output_directory = configs["output_directory"]
 
 continue_animation = True
 random_delay = random.randint(10, 130)
 
 def set_custom_paths():
-    global youtube_dl_path, output_directory
-    custom_youtube_dl_path = youtube_dl_path_entry.get()
+    global ffmpeg_path, output_directory
+    custom_ffmpeg_path = ffmpeg_path_entry.get()
     custom_output_directory = output_directory_entry.get()
 
-    if custom_youtube_dl_path:
-        youtube_dl_path = custom_youtube_dl_path
+    if custom_ffmpeg_path:
+        ffmpeg_path = custom_ffmpeg_path
 
     if custom_output_directory:
         if not custom_output_directory.endswith('\\'):
@@ -40,13 +43,13 @@ def set_custom_paths():
         output_directory = custom_output_directory
 
     config = {
-        "youtube_dl_path": youtube_dl_path,
+        "ffmpeg_path": ffmpeg_path,
         "output_directory": output_directory
     }
     with open(CONFIG_FILE, "w") as f:
         json.dump(config, f)
 
-def download_mp3():
+def download_content():
     try:
         global output_directory, continue_animation
         download_button.config(state=tk.DISABLED)
@@ -54,32 +57,42 @@ def download_mp3():
         continue_animation = True
         animate_spinner()
 
-        if not os.path.isfile(youtube_dl_path):
-            raise FileNotFoundError("youtube-dl not found in the specified path")
-
         youtube_url = url_entry.get()
 
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
+        
+        if not os.path.isfile(ffmpeg_path):
+            raise FileNotFoundError("ffmpeg_path not found in the specified path")
 
         if not re.search(r'(youtube\.com|youtu\.be)', youtube_url):
             raise ValueError("Invalid YouTube URL")
 
         clean_url = clean_youtube_url(youtube_url)
-        youtube_dl_command = f'{youtube_dl_path} -o "{output_directory}%(title)s.%(ext)s" -f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 {clean_url}'
+        file_type = selected_file_type.get()
+
+        ydl_opts = {
+            'format': f'bestaudio/best' if file_type in ('M4A', 'MP3') else f'bestvideo[ext={file_type.lower()}]+bestaudio[ext={file_type.lower()}]/best[ext={file_type.lower()}]/best',
+            'outtmpl': os.path.join(output_directory, '%(title)s.%(ext)s'),
+            'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': file_type.lower(), 'preferredquality': '0'}] if file_type in ('M4A', 'MP3') else [],
+            'ffmpeg_location': 'C:\\Users\\godsw\\OneDrive\\Documents\\applet\\build\\ffmpeg.exe'
+        }
 
         def run_download():
             try:
-                subprocess.run(youtube_dl_command, shell=True, check=True)
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([clean_url])
                 root.after(0, lambda: update_status("Download Complete!"))
-            except subprocess.CalledProcessError as e:
+            except yt_dlp.DownloadError as e:
                 root.after(0, lambda: update_status(f"Error: {e}"))
 
-        global download_thread
-        download_thread = threading.Thread(target=run_download)
-        download_thread.start()
-    except Exception as e:
-        update_status(f"Error: {e}")
+        Thread(target=run_download).start()
+
+    except FileNotFoundError as e:
+        root.after(0, lambda: update_status(f"Error: {e}"))
+    except ValueError as e:
+        root.after(0, lambda: update_status(f"Error: {e}"))
+
 
 def update_status(message):
     global continue_animation
@@ -116,33 +129,41 @@ png_count = count_png_files(IMAGE_FOLDER)
 if png_count == 0:
     png_count = extract_frames_from_gif("loading.gif", IMAGE_FOLDER)
 
-
 root = tk.Tk()
-root.title("YouTube MP3 Downloader")
+root.title("YouTube Downloader")
+
+selected_file_type = tk.StringVar(root)
+
+file_type_label = ttk.Label(root, text="Select File Type:")
+file_type_combobox = ttk.Combobox(root, textvariable=selected_file_type, values=file_types, width=6)
+file_type_combobox.set(file_types[0])
+
 
 url_label = ttk.Label(root, text="YouTube Video or Playlist URL:")
 url_entry = ttk.Entry(root, width=40)
-download_button = ttk.Button(root, text="Download MP3", command=download_mp3)
+download_button = ttk.Button(root, text="Download", command=download_content)
 status_label = ttk.Label(root, text="")
 
-youtube_dl_path_label = ttk.Label(root, text="Current youtube-dl Path:")
-youtube_dl_path_entry = ttk.Entry(root, width=40)
+ffmpeg_path_label = ttk.Label(root, text="Current ffmpeg Path:")
+ffmpeg_path_entry = ttk.Entry(root, width=40)
 output_directory_label = ttk.Label(root, text="Current Output Directory:")
 output_directory_entry = ttk.Entry(root, width=40)
 set_paths_button = ttk.Button(root, text="Set Paths", command=set_custom_paths)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
-download_button.grid(row=1, column=0, columnspan=2, padx=10, pady=0)
+file_type_label.grid(row=1, column=0, padx=10, pady=10, sticky="w") 
+file_type_combobox.grid(row=1, column=1, padx=10, pady=10, sticky="w")  
+download_button.grid(row=1, column=1, padx=100, pady=10, sticky="w")
 status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
 
-youtube_dl_path_label.grid(row=4, column=0, padx=10, pady=10)
-youtube_dl_path_entry.grid(row=4, column=1, padx=10, pady=10)
+ffmpeg_path_label.grid(row=4, column=0, padx=10, pady=10)
+ffmpeg_path_entry.grid(row=4, column=1, padx=10, pady=10)
 output_directory_label.grid(row=5, column=0, padx=10, pady=10)
 output_directory_entry.grid(row=5, column=1, padx=10, pady=10)
 set_paths_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
-youtube_dl_path_entry.insert(0, youtube_dl_path)
+ffmpeg_path_entry.insert(0, ffmpeg_path)
 output_directory_entry.insert(0, output_directory)
 
 root.mainloop()

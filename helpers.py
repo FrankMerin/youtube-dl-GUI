@@ -15,7 +15,7 @@ def load_config():
     with open(config_file, "r") as f:
         config = json.load(f)
     default_config = {
-        "youtube_dl_path": "",
+        "ffmpeg_path": "",
         "output_directory": ""
     }
     default_config.update(config)
@@ -44,5 +44,5 @@ def extract_frames_from_gif(input_gif_path, output_folder):
     return frame_number - 1
 
 def clean_youtube_url(url):
-    clean_url = re.sub(r'&list=.*', '', url)
+    clean_url = re.sub(r'(&list=|&t=).*', '', url)
     return clean_url
