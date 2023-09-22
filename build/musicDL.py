@@ -27,8 +27,6 @@ base_path = getattr(sys, '_MEIPASS', os.getcwd())
 ffmpeg_path = os.path.join(base_path, "ffmpeg.exe")
 
 config_directory = os.path.join(os.path.expanduser("~"), ".musicDL")
-if not os.path.exists(config_directory):
-    os.makedirs(config_directory)
 
 file_types = ["M4A", "MP3", 'MP4']
 CONFIG_FILE = os.path.join(config_directory, "config.json")

@@ -41,4 +41,4 @@ open terminal... python musictk.py
 
 download the build folder, add yt-dlp and ffmpeg to the folder, run the below command.
 
-pyinstaller --onefile --name musicDL musicDL.py --add-binary "ffmpeg.exe;." --add-binary "yt-dlp.exe;." --add-data "loading.gif;." --add-data "helpersDL.py;."
+pyinstaller --onefile --name musicDL musicDL.py --add-binary "ffmpeg.exe;." --add-data "loading.gif;." --add-data "helpersDL.py;."
