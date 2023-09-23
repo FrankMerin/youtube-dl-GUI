@@ -6,6 +6,8 @@ As this utalizes yt-dlp, it supports playlists (public/unlisted), and direct you
 
 Download the binary from the [releases page](https://github.com/FrankMerin/youtube-dl-applet/releases/).
 
+[Direct download](https://github.com/FrankMerin/youtube-dl-applet/releases/download/latest/musicDL.exe)
+
 ![Usage image](https://cdn.discordapp.com/attachments/280776371779928074/1155231678722215936/image.png)
 
 ### _Pre-Reqs (for building):_
