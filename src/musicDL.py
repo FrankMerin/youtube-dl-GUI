@@ -17,11 +17,12 @@ from helpersDL import (
     count_png_files,
     extract_frames_from_gif,
     clean_youtube_url,
+    calculate_time_difference,
+    is_valid_time
 )
 
 
 base_path = getattr(sys, '_MEIPASS', os.getcwd())
-
 
 
 ffmpeg_path = os.path.join(base_path, "ffmpeg.exe")
@@ -54,6 +55,8 @@ def set_custom_paths():
 
 def download_content():
     try:
+        start_time = start_time_entry.get()
+        end_time = end_time_entry.get()
         global output_directory, continue_animation, ffmpeg_path
         download_button.config(state=tk.DISABLED)
         status_label.config(text="")
@@ -78,6 +81,13 @@ def download_content():
             'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': file_type.lower(), 'preferredquality': '0'}] if file_type in ('M4A', 'MP3') else [],
             'ffmpeg_location': ffmpeg_path
         }
+        if trim_checkbox_var.get():
+            valid_time = is_valid_time(start_time, end_time)
+            if not valid_time[0]:
+                raise ValueError(valid_time[1])
+            diff_time = calculate_time_difference(start_time,end_time)
+            ydl_opts['postprocessor_args'] = ['-ss', start_time, '-t', diff_time]
+
         def run_download():
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -98,9 +108,7 @@ def update_status(message):
     continue_animation = False
 
 def animate_spinner():
-    global spinner_label
-    spinner_label = ttk.Label(root)
-    spinner_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+    spinner_label.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
     global spinner_index
     spinner_index = 1
@@ -124,12 +132,24 @@ def animate():
 png_count = count_png_files(IMAGE_FOLDER)
 if png_count == 0:
     png_count = extract_frames_from_gif(os.path.join(base_path, "loading.gif"), IMAGE_FOLDER)
-
+def toggle_trim():
+    if trim_checkbox_var.get():
+        start_time_label.grid(row=3, column=0, padx=10, pady=10, sticky="w")
+        start_time_entry.grid(row=3, column=1, padx=10, pady=10)
+        end_time_label.grid(row=4, column=0, padx=10, pady=10, sticky="w")
+        end_time_entry.grid(row=4, column=1, padx=10, pady=10)
+    else:
+        start_time_label.grid_remove()
+        start_time_entry.grid_remove()
+        end_time_label.grid_remove()
+        end_time_entry.grid_remove()
 
 root = tk.Tk()
 root.title("YouTube Downloader")
 
 selected_file_type = tk.StringVar(root)
+trim_checkbox_var = tk.BooleanVar(root)
+spinner_label = ttk.Label(root)
 
 file_type_label = ttk.Label(root, text="Select File Type:")
 file_type_combobox = ttk.Combobox(root, textvariable=selected_file_type, values=file_types, width=6)
@@ -139,6 +159,15 @@ url_label = ttk.Label(root, text="YouTube Video or Playlist URL:")
 url_entry = ttk.Entry(root, width=40)
 download_button = ttk.Button(root, text="Download", command=download_content)
 status_label = ttk.Label(root, text="")
+
+
+trim_checkbox = ttk.Checkbutton(root, text="Trim", variable=trim_checkbox_var, command=toggle_trim)
+start_time_label = ttk.Label(root, text="Start Time (hh:mm:ss):")
+start_time_entry = ttk.Entry(root, width=15)
+start_time_entry.insert(0, "00:00:00") 
+end_time_label = ttk.Label(root, text="End Time (hh:mm:ss):")
+end_time_entry = ttk.Entry(root, width=15)
+end_time_entry.insert(0, "00:00:00") 
 
 output_directory_label = ttk.Label(root, text="Current Output Directory:")
 output_directory_entry = ttk.Entry(root, width=40)
@@ -150,11 +179,11 @@ file_type_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 file_type_combobox.grid(row=1, column=1, padx=10, pady=10, sticky="w")  
 download_button.grid(row=1, column=1, padx=100, pady=10, sticky="w")
 status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
+trim_checkbox.grid(row=1, column=2, padx=10, pady=10, sticky="w")
 
-
-output_directory_label.grid(row=5, column=0, padx=10, pady=10)
-output_directory_entry.grid(row=5, column=1, padx=10, pady=10)
-set_paths_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+output_directory_label.grid(row=7, column=0, padx=10, pady=10)
+output_directory_entry.grid(row=7, column=1, padx=10, pady=10)
+set_paths_button.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
 
 
 output_directory_entry.insert(0, output_directory)
