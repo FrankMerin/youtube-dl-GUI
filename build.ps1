@@ -1,0 +1,1 @@
+pyinstaller --onefile --name musicDL src/musicDL.py --add-binary "src/ffmpeg.exe;."  --add-data "src/loading.gif;." --add-data "src/helpersDL.py;."
