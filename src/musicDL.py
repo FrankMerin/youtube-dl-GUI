@@ -62,7 +62,7 @@ def download_content():
         status_label.config(text="")
         continue_animation = True
         animate_spinner()
-
+        set_custom_paths()
 
         youtube_url = url_entry.get()
 
@@ -108,7 +108,7 @@ def update_status(message):
     continue_animation = False
 
 def animate_spinner():
-    spinner_label.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+    spinner_label.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
     global spinner_index
     spinner_index = 1
@@ -131,7 +131,7 @@ def animate():
 
 png_count = count_png_files(IMAGE_FOLDER)
 if png_count == 0:
-    png_count = extract_frames_from_gif(os.path.join(base_path, "loading.gif"), IMAGE_FOLDER)
+    png_count = extract_frames_from_gif(os.path.join(base_path, "assets", "loading.gif"), IMAGE_FOLDER)
 def toggle_trim():
     if trim_checkbox_var.get():
         start_time_label.grid(row=3, column=0, padx=10, pady=10, sticky="w")
@@ -146,6 +146,7 @@ def toggle_trim():
 
 root = tk.Tk()
 root.title("YouTube Downloader")
+root.iconbitmap(os.path.join(base_path, "assets", "logo.ico"))
 
 selected_file_type = tk.StringVar(root)
 trim_checkbox_var = tk.BooleanVar(root)
@@ -171,7 +172,6 @@ end_time_entry.insert(0, "00:00:00")
 
 output_directory_label = ttk.Label(root, text="Current Output Directory:")
 output_directory_entry = ttk.Entry(root, width=40)
-set_paths_button = ttk.Button(root, text="Set Paths", command=set_custom_paths)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
@@ -181,9 +181,8 @@ download_button.grid(row=1, column=1, padx=100, pady=10, sticky="w")
 status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
 trim_checkbox.grid(row=1, column=2, padx=10, pady=10, sticky="w")
 
-output_directory_label.grid(row=7, column=0, padx=10, pady=10)
-output_directory_entry.grid(row=7, column=1, padx=10, pady=10)
-set_paths_button.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
+output_directory_label.grid(row=5, column=0, padx=10, pady=10)
+output_directory_entry.grid(row=5, column=1, padx=10, pady=10)
 
 
 output_directory_entry.insert(0, output_directory)

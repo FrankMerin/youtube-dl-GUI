@@ -1,4 +1,4 @@
-# youtube-dl-applet (WINDOWS ONLY)
+# youtube-dl GUI (WINDOWS ONLY)
 
 As this utalizes yt-dlp, it supports playlists (public/unlisted), and direct youtube links/share links
 
@@ -8,7 +8,7 @@ Download the binary from the [releases page](https://github.com/FrankMerin/youtu
 
 [Direct download](https://github.com/FrankMerin/youtube-dl-applet/releases/download/latest/musicDL.exe)
 
-![Usage image](https://cdn.discordapp.com/attachments/280776371779928074/1155231678722215936/image.png)
+![Usage image](https://cdn.discordapp.com/attachments/280776371779928074/1156418796874117130/image.png)
 
 ### _Pre-Reqs (for building):_
 
