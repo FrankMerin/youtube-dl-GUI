@@ -1,6 +1,7 @@
 # youtube-dl GUI (WINDOWS ONLY)
 
-==NOTE!!!!==
+=====================NOTE!!!!=====================
+
 WINDOWS RECOGNIZES THE EXE AS Trojan:Win32/Wacatac.B!ml
 
 Unfortunately, I can't do much about it.
