@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
-import subprocess
 import re
-import threading
 from PIL import Image, ImageTk
 import os
 import random
