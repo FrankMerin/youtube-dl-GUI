@@ -40,7 +40,6 @@ def select_directory():
     """Open a dialog to select output directory"""
     directory = filedialog.askdirectory()
     if directory:
-        # Update the entry field with selected directory
         output_directory_entry.delete(0, tk.END)
         output_directory_entry.insert(0, directory)
 
