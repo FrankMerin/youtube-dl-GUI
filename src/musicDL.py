@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import subprocess
 import re
 import threading
@@ -38,6 +38,14 @@ output_directory = configs["output_directory"]
 continue_animation = True
 random_delay = random.randint(10, 130)
 
+def select_directory():
+    """Open a dialog to select output directory"""
+    directory = filedialog.askdirectory()
+    if directory:
+        # Update the entry field with selected directory
+        output_directory_entry.delete(0, tk.END)
+        output_directory_entry.insert(0, directory)
+
 def set_custom_paths():
     global output_directory
 
@@ -45,7 +53,8 @@ def set_custom_paths():
 
     if custom_output_directory:
         if not custom_output_directory.endswith('\\'):
-            custom_output_directory = custom_output_directory + '\\'
+            # Handle cross-platform path separator
+            custom_output_directory = os.path.join(custom_output_directory, '')
         output_directory = custom_output_directory
     config = {
         "output_directory": output_directory
@@ -158,7 +167,13 @@ file_type_combobox.set(file_types[0])
 
 url_label = ttk.Label(root, text="YouTube Video or Playlist URL:")
 url_entry = ttk.Entry(root, width=40)
-download_button = ttk.Button(root, text="Download", command=download_content)
+
+button_style = ttk.Style()
+button_style.configure("Download.TButton", font=("Arial", 10, "bold"))
+download_button = ttk.Button(root, 
+                           text="↓ Download", 
+                           command=download_content,
+                           style="Download.TButton")
 status_label = ttk.Label(root, text="")
 
 
@@ -170,8 +185,9 @@ end_time_label = ttk.Label(root, text="End Time (hh:mm:ss):")
 end_time_entry = ttk.Entry(root, width=15)
 end_time_entry.insert(0, "00:00:00") 
 
-output_directory_label = ttk.Label(root, text="Current Output Directory:")
-output_directory_entry = ttk.Entry(root, width=40)
+output_directory_label = ttk.Label(root, text="Output Directory:")
+output_directory_entry = ttk.Entry(root, width=30)
+browse_button = ttk.Button(root, text="Browse...", command=select_directory)
 
 url_label.grid(row=0, column=0, padx=10, pady=10)
 url_entry.grid(row=0, column=1, padx=10, pady=10)
@@ -182,8 +198,8 @@ status_label.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
 trim_checkbox.grid(row=1, column=2, padx=10, pady=10, sticky="w")
 
 output_directory_label.grid(row=5, column=0, padx=10, pady=10)
-output_directory_entry.grid(row=5, column=1, padx=10, pady=10)
-
+output_directory_entry.grid(row=5, column=1, padx=10, pady=10, sticky="w")
+browse_button.grid(row=5, column=1, padx=(210, 0), pady=10, sticky="w")  # Position the button next to the entry field
 
 output_directory_entry.insert(0, output_directory)
 
