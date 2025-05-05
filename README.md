@@ -11,8 +11,10 @@ Download the binary from the [releases page](https://github.com/FrankMerin/youtu
 ### _Pre-Reqs (for building):_
 
 ffmpeg - https://ffmpeg.org/
+ffprobe - https://www.gyan.dev/ffmpeg/builds/
 
 Save ffmpeg.exe to the src folder
+Save ffprobe.exe to the src folder
 
 
 #### _Build on your own:_
